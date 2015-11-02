@@ -5,7 +5,7 @@ var utils = require('../scripts/gulp-utils.js');
 
 exports.ROOT       = path.normalize(__dirname + '/..');
 exports.VERSION    = args.version || require('../package.json').version;
-exports.LR_PORT    = args.port || args.p || 8080;
+exports.LR_PORT    = args.port || args.p || 8081;
 exports.IS_DEV     = args.dev;
 exports.SHA        = args.sha;
 exports.BUILD_MODE = getBuildMode();
