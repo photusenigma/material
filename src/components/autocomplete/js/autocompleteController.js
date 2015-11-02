@@ -406,9 +406,13 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   function focus () {
     hasFocus = true;
     $scope.itemHasFocus = hasFocus;
-    announceFocusChange();
+    announceFocusChange();  
     //-- if searchText is null, or clearOnFocus is true - let's force it an empty string
-    if (!angular.isString($scope.searchText)) $scope.searchText = '';
+    if ($scope.clearOnFocus) {
+      $scope.searchText = null;
+    } else if (!angular.isString($scope.searchText)) {
+      $scope.searchText = '';
+    }
     ctrl.hidden = shouldHide();
     if (!ctrl.hidden) handleQuery();
   }
@@ -448,7 +452,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       case $mdConstant.KEY_CODE.ESCAPE:
         event.stopPropagation();
         event.preventDefault();
-        clearValue();
+        if (!$scope.revertOnBlur) clearValue();
 
         // Force the component to blur if they hit escape
         doBlur(true);
