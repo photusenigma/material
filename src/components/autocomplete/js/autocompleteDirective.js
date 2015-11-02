@@ -141,10 +141,15 @@ function MdAutocomplete () {
       autofocus:      '=?mdAutofocus',
       floatingLabel:  '@?mdFloatingLabel',
       autoselect:     '=?mdAutoselect',
+      revertOnBlur:   '=?mdRevertOnBlur',
+      clearOnFocus:   '=?mdClearOnFocus',
+      itemHasFocus:   '=?mdItemHasFocus', 
+      itemFocusChange:'&?mdItemFocusChange',
       menuClass:      '@?mdMenuClass',
       inputId:        '@?mdInputId'
     },
     link: function(scope, element, attrs, controller) {
+      // scope.revertOnBlur = angular.isDefined(scope.revertOnBlur)? scope.revertOnBlur : true;
       controller.hasNotFound = hasNotFoundTemplate;
     },
     template:     function (element, attr) {

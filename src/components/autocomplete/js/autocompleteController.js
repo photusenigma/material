@@ -251,6 +251,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * When the user's mouse leaves the menu, blur events may hide the menu again.
    */
   function onListLeave () {
+    if (!hasFocus) elements.input.focus();
     noBlur = false;
     ctrl.hidden = shouldHide();
   }
@@ -269,6 +270,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function selectedItemChange (selectedItem, previousSelectedItem) {
     if (selectedItem) {
+      // don't nothing if revertOnBlur is true, and selected item is "falsy" or the same as previous
+      if (!shouldAnnounceChange(selectedItem, previousSelectedItem)) return;
+
       getDisplayValue(selectedItem).then(function (val) {
         $scope.searchText = val;
         handleSelectedItemChange(selectedItem, previousSelectedItem);
@@ -276,6 +280,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     }
 
     if (selectedItem !== previousSelectedItem) announceItemChange();
+  }
+
+  function shouldAnnounceChange (selectedItem, previousSelectedItem) {
+    return ($scope.revertOnBlur && selectedItem && selectedItem !== previousSelectedItem) ? true : false;
   }
 
   /**
@@ -290,6 +298,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function announceTextChange () {
     angular.isFunction($scope.textChange) && $scope.textChange();
+  }
+
+  function announceFocusChange () {
+    angular.isFunction($scope.itemFocusChange) && $scope.itemFocusChange()($scope.itemHasFocus);
   }
 
   /**
@@ -354,11 +366,26 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
   }
 
+  function revertSelectedValue () {
+    if (ctrl.previousSelectedItem && $scope.selectedItem !== ctrl.previousSelectedItem) {
+      $scope.selectedItem = ctrl.previousSelectedItem;
+    }
+  }
+
   /**
    * Handles input blur event, determines if the dropdown should hide.
    */
   function blur () {
     if (!noBlur) {
+        hasFocus = false;
+        $scope.itemHasFocus = hasFocus;
+        announceFocusChange();
+    
+        if ($scope.revertOnBlur) {
+          revertSelectedValue();
+        }
+
+    
       hasFocus = false;
       ctrl.hidden = shouldHide();
     }
@@ -378,7 +405,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function focus () {
     hasFocus = true;
-    //-- if searchText is null, let's force it to be a string
+    $scope.itemHasFocus = hasFocus;
+    announceFocusChange();
+    //-- if searchText is null, or clearOnFocus is true - let's force it an empty string
     if (!angular.isString($scope.searchText)) $scope.searchText = '';
     ctrl.hidden = shouldHide();
     if (!ctrl.hidden) handleQuery();
@@ -496,11 +525,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * @returns {boolean}
    */
   function shouldHide () {
-    if ((ctrl.loading && !hasMatches()) || hasSelection() || !hasFocus) {
-      return true;
-    }
-
-    return !shouldShow();
+    if (ctrl.loading && !hasMatches()) return true; // Hide while loading initial matches
+    else if (hasSelection()) return true;           // Hide if there is already a selection
+    else if (!hasFocus) return true;                // Hide if the input does not have focus
+    else return !shouldShow();                      // Defer to standard show logic
   }
 
   /**
