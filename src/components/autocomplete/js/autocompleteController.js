@@ -270,9 +270,6 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function selectedItemChange (selectedItem, previousSelectedItem) {
     if (selectedItem) {
-      // don't nothing if revertOnBlur is true, and selected item is "falsy" or the same as previous
-      if (!shouldAnnounceChange(selectedItem, previousSelectedItem)) return;
-
       getDisplayValue(selectedItem).then(function (val) {
         $scope.searchText = val;
         handleSelectedItemChange(selectedItem, previousSelectedItem);
@@ -282,14 +279,18 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     if (selectedItem !== previousSelectedItem) announceItemChange();
   }
 
-  function shouldAnnounceChange (selectedItem, previousSelectedItem) {
-    return ($scope.revertOnBlur && selectedItem && selectedItem !== previousSelectedItem) ? true : false;
+  function shouldAnnounceChange () {
+    return $scope.revertOnBlur && !$scope.selectedItem && !angular.equals($scope.selectedItem, ctrl.previousSelectedItem);
   }
 
   /**
    * Use the user-defined expression to announce changes each time a new item is selected
    */
   function announceItemChange () {
+    if (shouldAnnounceChange()) {
+      // don't nothing if revertOnBlur is true, and selected item is "falsy"
+      return;
+    }
     angular.isFunction($scope.itemChange) && $scope.itemChange(getItemAsNameVal($scope.selectedItem));
   }
 
@@ -367,7 +368,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   }
 
   function revertSelectedValue () {
-    if (ctrl.previousSelectedItem && $scope.selectedItem !== ctrl.previousSelectedItem) {
+    if (ctrl.previousSelectedItem && !$scope.selectedItem) {
       $scope.selectedItem = ctrl.previousSelectedItem;
     }
   }
@@ -376,17 +377,15 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * Handles input blur event, determines if the dropdown should hide.
    */
   function blur () {
-    if (!noBlur) {
-        hasFocus = false;
-        $scope.itemHasFocus = hasFocus;
-        announceFocusChange();
+    hasFocus = false;
+    $scope.itemHasFocus = hasFocus;
+    announceFocusChange();
     
-        if ($scope.revertOnBlur) {
-          revertSelectedValue();
-        }
+    if ($scope.revertOnBlur) {
+      revertSelectedValue();
+    }
 
-    
-      hasFocus = false;
+    if (!noBlur) {
       ctrl.hidden = shouldHide();
     }
   }
@@ -407,10 +406,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     hasFocus = true;
     $scope.itemHasFocus = hasFocus;
     announceFocusChange();  
-    //-- if searchText is null, or clearOnFocus is true - let's force it an empty string
-    if ($scope.clearOnFocus) {
-      $scope.searchText = null;
-    } else if (!angular.isString($scope.searchText)) {
+    if (!angular.isString($scope.searchText) || $scope.clearOnFocus) {
       $scope.searchText = '';
     }
     ctrl.hidden = shouldHide();
@@ -469,7 +465,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * @returns {*}
    */
   function getMinLength () {
-    return angular.isNumber($scope.minLength) ? $scope.minLength : 1;
+    return angular.isNumber($scope.minLength) ? $scope.minLength : 0;
   }
 
   /**
@@ -615,6 +611,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         ngModel.$render();
       }).finally(function () {
         $scope.selectedItem = ctrl.matches[ index ];
+        if ($scope.selectedItem) {
+          ctrl.previousSelectedItem = $scope.selectedItem;
+        }
         setLoading(false);
       });
     }, false);
