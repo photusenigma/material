@@ -277,11 +277,8 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     }
 
     if (shouldAnnounceChange(selectedItem)) {
-      if (selectedItem) {
-        ctrl.previousSelectedItem = selectedItem;
-      }
-      
       announceItemChange(selectedItem);
+      ctrl.previousSelectedItem = selectedItem;
     }
   }
 
@@ -293,7 +290,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     }
 
     if (!$scope.revertOnBlur || selectedItem) { 
-      shouldAnnounce = true; 
+      shouldAnnounce = true;
     }
     return shouldAnnounce;
   }
@@ -395,14 +392,15 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     hasFocus = false;
     $scope.itemHasFocus = hasFocus;
     announceFocusChange();
-    
-    if ($scope.revertOnBlur) {
+
+    if (ctrl.hidden && $scope.revertOnBlur) {
       revertSelectedValue();
     }
 
     if (!noBlur) {
       ctrl.hidden = shouldHide();
     }
+
   }
 
   /**
@@ -626,9 +624,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         ngModel.$render();
       }).finally(function () {
         $scope.selectedItem = ctrl.matches[ index ];
-        // if ($scope.selectedItem) {
-        //   ctrl.previousSelectedItem = $scope.selectedItem;
-        // }
+         //if ($scope.selectedItem) {
+         //  ctrl.previousSelectedItem = $scope.selectedItem;
+         //}
         setLoading(false);
       });
     }, false);
