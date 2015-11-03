@@ -299,10 +299,6 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * Use the user-defined expression to announce changes each time a new item is selected
    */
   function announceItemChange () {
-    if (shouldAnnounceChange()) {
-      // don't nothing if revertOnBlur is true, and selected item is "falsy"
-      return;
-    }
     angular.isFunction($scope.itemChange) && $scope.itemChange(getItemAsNameVal($scope.selectedItem));
   }
 
@@ -393,7 +389,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     $scope.itemHasFocus = hasFocus;
     announceFocusChange();
 
-    if (ctrl.hidden && $scope.revertOnBlur) {
+    if (!ctrl.hidden && $scope.revertOnBlur) {
       revertSelectedValue();
     }
 
