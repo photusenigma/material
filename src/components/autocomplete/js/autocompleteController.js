@@ -276,11 +276,26 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       });
     }
 
-    if (selectedItem !== previousSelectedItem) announceItemChange();
+    if (shouldAnnounceChange(selectedItem)) {
+      if (selectedItem) {
+        ctrl.previousSelectedItem = selectedItem;
+      }
+      
+      announceItemChange(selectedItem);
+    }
   }
 
-  function shouldAnnounceChange () {
-    return $scope.revertOnBlur && !$scope.selectedItem && !angular.equals($scope.selectedItem, ctrl.previousSelectedItem);
+  function shouldAnnounceChange (selectedItem) {
+    var shouldAnnounce = false;
+    var isNewValue = (!ctrl.previousSelectedItem && selectedItem) || (selectedItem !== ctrl.previousSelectedItem);
+    if (!isNewValue) {
+      return shouldAnnounce;
+    }
+
+    if (!$scope.revertOnBlur || selectedItem) { 
+      shouldAnnounce = true; 
+    }
+    return shouldAnnounce;
   }
 
   /**
@@ -611,9 +626,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         ngModel.$render();
       }).finally(function () {
         $scope.selectedItem = ctrl.matches[ index ];
-        if ($scope.selectedItem) {
-          ctrl.previousSelectedItem = $scope.selectedItem;
-        }
+        // if ($scope.selectedItem) {
+        //   ctrl.previousSelectedItem = $scope.selectedItem;
+        // }
         setLoading(false);
       });
     }, false);
@@ -661,6 +676,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         });
       },true, $scope);
     }
+
     function handleResults (matches) {
       cache[ term ] = matches;
       if ((searchText || '') !== ($scope.searchText || '')) return; //-- just cache the results if old request
