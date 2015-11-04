@@ -278,20 +278,11 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
     if (shouldAnnounceChange(selectedItem)) {
       announceItemChange(selectedItem);
-      ctrl.previousSelectedItem = selectedItem;
     }
   }
 
   function shouldAnnounceChange (selectedItem) {
-    var shouldAnnounce = false;
-    var isNewValue = (!ctrl.previousSelectedItem && selectedItem) || (selectedItem !== ctrl.previousSelectedItem);
-    if (!isNewValue) {
-      return shouldAnnounce;
-    }
-
-    if (!$scope.revertOnBlur || selectedItem) { 
-      shouldAnnounce = true;
-    }
+    var shouldAnnounce = !$scope.revertOnBlur || selectedItem;
     return shouldAnnounce;
   }
 
@@ -375,28 +366,16 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
   }
 
-  function revertSelectedValue () {
-    if (ctrl.previousSelectedItem && !$scope.selectedItem) {
-      $scope.selectedItem = ctrl.previousSelectedItem;
-    }
-  }
-
   /**
    * Handles input blur event, determines if the dropdown should hide.
    */
   function blur () {
-    hasFocus = false;
-    $scope.itemHasFocus = hasFocus;
-    announceFocusChange();
-
-    if (!ctrl.hidden && $scope.revertOnBlur) {
-      revertSelectedValue();
-    }
-
     if (!noBlur) {
+      hasFocus = false;
+      $scope.itemHasFocus = hasFocus;
+      announceFocusChange();
       ctrl.hidden = shouldHide();
     }
-
   }
 
   /**
@@ -534,10 +513,14 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * @returns {boolean}
    */
   function shouldHide () {
-    if (ctrl.loading && !hasMatches()) return true; // Hide while loading initial matches
-    else if (hasSelection()) return true;           // Hide if there is already a selection
-    else if (!hasFocus) return true;                // Hide if the input does not have focus
-    else return !shouldShow();                      // Defer to standard show logic
+    var shouldHide = false;
+    if (ctrl.loading && !hasMatches()) shouldHide =  true; // Hide while loading initial matches
+    else if (hasSelection()) shouldHide =  true;           // Hide if there is already a selection
+    else if (!hasFocus) shouldHide =  true;                // Hide if the input does not have focus
+    else shouldHide =  !shouldShow();                      // Defer to standard show logic
+
+    if (shouldHide && !hasFocus) shouldRevertSelectedDisplay();
+    return shouldHide;
   }
 
   /**
@@ -620,9 +603,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         ngModel.$render();
       }).finally(function () {
         $scope.selectedItem = ctrl.matches[ index ];
-         //if ($scope.selectedItem) {
-         //  ctrl.previousSelectedItem = $scope.selectedItem;
-         //}
+         if ($scope.selectedItem) {
+           ctrl.previousSelectedItem = $scope.selectedItem;
+         }
         setLoading(false);
       });
     }, false);
@@ -733,6 +716,13 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     var textLength = (ctrl.scope.searchText || '').length;
 
     return ctrl.hasNotFound && !hasMatches() && !ctrl.loading && textLength >= getMinLength() && hasFocus && !hasSelection();
+  }
+
+  function shouldRevertSelectedDisplay () {
+    if ($scope.revertOnBlur && !$scope.selectedItem && ctrl.previousSelectedItem) {
+      $scope.selectedItem = ctrl.previousSelectedItem;
+      selectedItemChange($scope.selectedItem);
+    }
   }
 
   /**
