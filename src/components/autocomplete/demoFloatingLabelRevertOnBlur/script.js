@@ -15,6 +15,7 @@
     self.itemHasFocus  = false;
     self.handleFocusChange = handleFocusChange;
     self.handleSelectedItemChange = handleSelectedItemChange;
+    self.selectItem = selectItem;
 
     // ******************************
     // Internal methods
@@ -67,6 +68,16 @@
 
     function handleFocusChange (hasFocus) {
       console.log('focus changed.  autocomplete has focus: ', hasFocus);
+    }
+
+    function selectItem (str) {
+      var selectedItems = self.states.filter(function(obj) {
+        return obj.value === str.toLowerCase();
+      });
+
+      if (selectedItems && selectedItems.length === 1) {
+        self.selectedItem = selectedItems[0];
+      }
     }
   }
 })();

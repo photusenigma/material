@@ -62,6 +62,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     $mdUtil.initOptionalProperties($scope, $attrs, { searchText: null, selectedItem: null });
     $mdTheming($element);
     configureWatchers();
+    if ($scope.selectedItem) {
+      ctrl.previousSelectedItem = $scope.selectedItem;
+    }
     $mdUtil.nextTick(function () {
       gatherElements();
       moveDropdown();
@@ -260,6 +263,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * When the mouse button is released, send focus back to the input field.
    */
   function onMouseup () {
+    ctrl.selectionByMouse = true;
     elements.input.focus();
   }
 
@@ -270,6 +274,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function selectedItemChange (selectedItem, previousSelectedItem) {
     if (selectedItem) {
+      if(!ctrl.selectionByMouse) {
+        ctrl.previousSelectedItem = selectedItem
+      }
+
       getDisplayValue(selectedItem).then(function (val) {
         $scope.searchText = val;
         handleSelectedItemChange(selectedItem, previousSelectedItem);
@@ -394,7 +402,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     hasFocus = true;
     $scope.itemHasFocus = hasFocus;
     announceFocusChange();  
-    if (!angular.isString($scope.searchText) || $scope.clearOnFocus) {
+    if (!angular.isString($scope.searchText) || ($scope.clearOnFocus && !ctrl.selectionByMouse)) {
       $scope.searchText = '';
     }
     ctrl.hidden = shouldHide();
@@ -605,6 +613,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         $scope.selectedItem = ctrl.matches[ index ];
          if ($scope.selectedItem) {
            ctrl.previousSelectedItem = $scope.selectedItem;
+           ctrl.selectionByMouse = false;
          }
         setLoading(false);
       });
