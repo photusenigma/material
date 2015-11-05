@@ -145,11 +145,15 @@ function MdAutocomplete () {
       clearOnFocus:   '=?mdClearOnFocus',
       itemHasFocus:   '=?mdItemHasFocus', 
       itemFocusChange:'&?mdItemFocusChange',
+      actLikeSelect:  '&?mdActLikeSelect',
       menuClass:      '@?mdMenuClass',
       inputId:        '@?mdInputId'
     },
     link: function(scope, element, attrs, controller) {
-      // scope.revertOnBlur = angular.isDefined(scope.revertOnBlur)? scope.revertOnBlur : true;
+      if (attrs.hasOwnProperty('mdActLikeSelect')) {
+          scope.revertOnBlur = true;
+          scope.clearOnFocus = true;
+      }
       controller.hasNotFound = hasNotFoundTemplate;
     },
     template:     function (element, attr) {
@@ -195,6 +199,7 @@ function MdAutocomplete () {
                   </li>' + noItemsTemplate + '\
             </ul>\
           </md-virtual-repeat-container>\
+          ' + (attr.hasOwnProperty('mdActLikeSelect') ? getSelectIcon() : '') + '\
         </md-autocomplete-wrap>\
         <aria-status\
             class="md-visually-hidden"\
@@ -245,6 +250,7 @@ function MdAutocomplete () {
                   aria-activedescendant=""\
                   aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"/>\
               <div md-autocomplete-parent-scope md-autocomplete-replace>' + leftover + '</div>\
+              <span class="md-select-icon" aria-hidden="true"></span>\
             </md-input-container>';
         } else {
           return '\
@@ -278,6 +284,10 @@ function MdAutocomplete () {
                 ';
         }
       }
+
+        function getSelectIcon() {
+            return '<md-icon md-font-set="material-icons" class="material-icons select-arrow-down" fill="#666666" size="20" ng-click="$mdAutocompleteCtrl.focusElement()">arrow_drop_down</md-icon>';
+        }
     }
   };
 }

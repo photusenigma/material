@@ -50,6 +50,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   ctrl.unregisterSelectedItemWatcher = unregisterSelectedItemWatcher;
   ctrl.notFoundVisible               = notFoundVisible;
   ctrl.loadingIsVisible              = loadingIsVisible;
+  ctrl.focusElement                  = focusElement;
 
   return init();
 
@@ -59,6 +60,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * Initialize the controller, setup watchers, gather elements
    */
   function init () {
+    ctrl.initComplete = false;
     $mdUtil.initOptionalProperties($scope, $attrs, { searchText: null, selectedItem: null });
     $mdTheming($element);
     configureWatchers();
@@ -70,6 +72,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       moveDropdown();
       focusElement();
       $element.on('focus', focusElement);
+      ctrl.initComplete = true;
     });
   }
 
@@ -149,7 +152,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * Sends focus to the input element.
    */
   function focusElement () {
-    if ($scope.autofocus) elements.input.focus();
+    if ($scope.autofocus || ($scope.revertOnBlur && ctrl.initComplete)) elements.input.focus();
   }
 
   /**
@@ -728,9 +731,13 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   }
 
   function shouldRevertSelectedDisplay () {
-    if ($scope.revertOnBlur && !$scope.selectedItem && ctrl.previousSelectedItem) {
-      $scope.selectedItem = ctrl.previousSelectedItem;
-      selectedItemChange($scope.selectedItem);
+    if ($scope.revertOnBlur && !$scope.selectedItem) {
+      if (ctrl.previousSelectedItem) {
+        $scope.selectedItem = ctrl.previousSelectedItem || null;
+        selectedItemChange($scope.selectedItem);
+      } else {
+        $scope.searchText = '';
+      }
     }
   }
 
@@ -765,5 +772,4 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       if (searchText == displayValue) select(0);
     });
   }
-
 }
