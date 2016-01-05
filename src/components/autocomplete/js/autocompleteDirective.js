@@ -286,7 +286,7 @@ function MdAutocomplete () {
       }
 
         function getSelectIcon() {
-            return '<md-icon md-font-set="material-icons" class="material-icons select-arrow-down" fill="#666666" size="20" ng-click="$mdAutocompleteCtrl.focusElement()">arrow_drop_down</md-icon>';
+            return '<span class="md-select-icon" aria-hidden="true" ng-click="$mdAutocompleteCtrl.focusElement()"></span>';
         }
     }
   };

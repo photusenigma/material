@@ -160,6 +160,19 @@ md-autocomplete {
       path {
         stroke-width: 0;
       }
+      &.select-arrow-down {
+        position: absolute;
+        top: 24px;
+        right: 2px;
+      }
+      &.md-select-icon:after {
+        display: block;
+        content: '\25BC';
+        position: relative;
+        top: 2px;
+        speak: none;
+        transform: scaleY(0.6) scaleX(1);
+      }
     }
     &.ng-enter {
       transform: scale(0);
@@ -175,13 +188,27 @@ md-autocomplete {
       }
     }
   }
-  md-icon {
-    &.select-arrow-down {
-      position: absolute;
-      top: 24px;
-      right: 2px;
-    }
+
+  .md-select-icon {
+    color: rgba(0, 0, 0, 0.870588);
+    display: block;
+    align-items: flex-end;
+    text-align: end;
+    margin-left: -25px;
+    width: 3 * $baseline-grid;
+    margin: 0 .5 * $baseline-grid;
+    transform: translate3d(0, 1px, 0);
   }
+
+  .md-select-icon:after {
+    display: block;
+    content: '\25BC';
+    position: relative;
+    top: 2px;
+    speak: none;
+    transform: scaleY(0.6) scaleX(1);
+  }
+
   @media screen and (-ms-high-contrast: active) {
     $border-color: #fff;
 
