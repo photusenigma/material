@@ -279,6 +279,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function selectedItemChange (selectedItem, previousSelectedItem) {
     if (selectedItem) {
+      // don't nothing if revertOnBlur is true, and selected item is "falsy" or the same as previous
+      if (!shouldAnnounceChange(selectedItem, previousSelectedItem)) return;
+
       getDisplayValue(selectedItem).then(function (val) {
         $scope.searchText = val;
         handleSelectedItemChange(selectedItem, previousSelectedItem);
@@ -286,6 +289,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     }
 
     if (selectedItem !== previousSelectedItem) announceItemChange();
+  }
+
+  function shouldAnnounceChange (selectedItem, previousSelectedItem) {
+    return ($scope.revertOnBlur && selectedItem && selectedItem !== previousSelectedItem) ? true : false;
   }
 
   /**
@@ -300,6 +307,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function announceTextChange () {
     angular.isFunction($scope.textChange) && $scope.textChange();
+  }
+
+  function announceFocusChange () {
+    angular.isFunction($scope.itemFocusChange) && $scope.itemFocusChange()($scope.itemHasFocus);
   }
 
   /**
@@ -364,11 +375,24 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
   }
 
+  function revertSelectedValue () {
+    if (ctrl.previousSelectedItem && $scope.selectedItem !== ctrl.previousSelectedItem) {
+      $scope.selectedItem = ctrl.previousSelectedItem;
+    }
+  }
+
   /**
    * Handles input blur event, determines if the dropdown should hide.
    */
   function blur () {
     hasFocus = false;
+    $scope.itemHasFocus = hasFocus;
+    announceFocusChange();
+    
+    if ($scope.revertOnBlur) {
+      revertSelectedValue();
+    }
+
     if (!noBlur) {
       ctrl.hidden = shouldHide();
     }
@@ -391,7 +415,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function focus () {
     hasFocus = true;
-    //-- if searchText is null, let's force it to be a string
+    $scope.itemHasFocus = hasFocus;
+    announceFocusChange();
+    //-- if searchText is null, or clearOnFocus is true - let's force it an empty string
     if (!angular.isString($scope.searchText)) $scope.searchText = '';
     ctrl.hidden = shouldHide();
     if (!ctrl.hidden) handleQuery();
