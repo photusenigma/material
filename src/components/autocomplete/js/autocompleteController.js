@@ -461,7 +461,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       case $mdConstant.KEY_CODE.ESCAPE:
         event.stopPropagation();
         event.preventDefault();
-        clearValue();
+        if (!$scope.revertOnBlur) clearValue();
 
         // Force the component to blur if they hit escape
         doBlur(true);
@@ -640,6 +640,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         ngModel.$render();
       }).finally(function () {
         $scope.selectedItem = ctrl.matches[ index ];
+        if ($scope.selectedItem) {
+           ctrl.previousSelectedItem = $scope.selectedItem;
+           ctrl.selectionByMouse = false;
+        }
         setLoading(false);
       });
     }, false);

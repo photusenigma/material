@@ -8,7 +8,7 @@
       <p>The following example demonstrates floating labels being used as a normal form element.</p>
       <div layout-gt-sm="row">
         <md-input-container flex>
-          <label>Name</label>
+          <label>Name (normal mp-input field)</label>
           <input type="text"/>
         </md-input-container>
         <md-autocomplete flex
@@ -20,7 +20,7 @@
             md-search-text="ctrl.searchText"
             md-items="item in ctrl.querySearch(ctrl.searchText)"
             md-item-text="item.display"
-            md-floating-label="Favorite state"
+            md-floating-label="Favorite state (md-autocomplete with @md-act-like-selected)"
             md-item-has-focus="ctrl.itemHasFocus"
             md-item-focus-change="ctrl.handleFocusChange"
             md-selected-item-change="ctrl.handleSelectedItemChange(item)"
