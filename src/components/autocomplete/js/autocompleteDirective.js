@@ -149,7 +149,8 @@ function MdAutocomplete () {
       itemHasFocus:   '=?mdItemHasFocus', 
       itemFocusChange:'&?mdItemFocusChange',
       actLikeSelect:  '&?mdActLikeSelect',
-      showOptionTooltips: '&?mdShowOptionTooltips'
+      showItemTooltips: '&?mdShowItemTooltips',
+      itemDisplayProp: '&?mdItemDisplayProp'
 
     },
     link: function(scope, element, attrs, controller) {
@@ -194,7 +195,7 @@ function MdAutocomplete () {
             <ul class="md-autocomplete-suggestions"\
                 ng-class="::menuClass"\
                 id="ul-{{$mdAutocompleteCtrl.id}}">\
-              <li '+ getOptionTooltip() +' md-virtual-repeat="item in $mdAutocompleteCtrl.matches"\
+              <li '+ getItemTooltip() +' md-virtual-repeat="item in $mdAutocompleteCtrl.matches"\
                   ng-class="{ selected: $index === $mdAutocompleteCtrl.index }"\
                   ng-click="$mdAutocompleteCtrl.select($index)"\
                   md-extra-name="$mdAutocompleteCtrl.itemName">\
@@ -210,8 +211,10 @@ function MdAutocomplete () {
           <p ng-repeat="message in $mdAutocompleteCtrl.messages track by $index" ng-if="message">{{message}}</p>\
         </aria-status>';
 
-      function getOptionTooltip() {
-        return attr.hasOwnProperty('mdShowOptionTooltips') ? 'title="{{item.display}}"' : '';
+      function getItemTooltip() {
+        var displayProp = attr.hasOwnProperty('mdItemDisplayProp') ? attr.mdItemDisplayProp : 'display';
+        var itemTag = "item['"+ displayProp +"']";
+        return attr.hasOwnProperty('mdShowItemTooltips') ? 'title="{{'+ itemTag +'}}"' : '';
       }
 
       function getItemTemplate() {
