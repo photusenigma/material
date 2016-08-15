@@ -103,6 +103,15 @@
     cell.setAttribute('role', 'gridcell');
 
     if (opt_date) {
+      var visualDateRange = calendarCtrl.visualDateRange;
+      var hasMin = calendarCtrl.minDate;
+      var hasMax = calendarCtrl.maxDate;
+      var isToday = this.dateUtil.isSameDay(opt_date, calendarCtrl.today);
+      var isAfterSelected = opt_date >= calendarCtrl.selectedDate;
+      var isBeforeSelected = opt_date <= calendarCtrl.selectedDate;
+      var isEndDate = hasMax && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.maxDate, 1));
+      var isStartDate = hasMin && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.minDate, -1));
+
       cell.setAttribute('tabindex', '-1');
       cell.setAttribute('aria-label', this.dateLocale.longDateFormatter(opt_date));
       cell.id = calendarCtrl.getDateId(opt_date);
@@ -125,6 +134,7 @@
       var cellText = this.dateLocale.dates[opt_date.getDate()];
 
       if (this.isDateEnabled(opt_date)) {
+     
         // Add a indicator for select, hover, and focus states.
         var selectionIndicator = document.createElement('span');
         cell.appendChild(selectionIndicator);
@@ -136,6 +146,43 @@
         if (calendarCtrl.focusDate && this.dateUtil.isSameDay(opt_date, calendarCtrl.focusDate)) {
           this.focusAfterAppend = cell;
         }
+
+        if (visualDateRange && hasMin && hasMax && (isToday || isAfterSelected)) {
+          cell.classList.add('md-calendar-date-within-range');
+        } 
+
+        if (visualDateRange && hasMin && hasMax && isToday && isBeforeSelected) {
+          cell.classList.add('md-today-not-selected');
+        }
+
+        if (visualDateRange && hasMin && !hasMax && isBeforeSelected) {
+          cell.classList.add('md-calendar-date-within-range');
+        }
+
+        if (visualDateRange && hasMin && !hasMax && !isBeforeSelected) {
+          cell.classList.add('md-date-selected-hover');
+        }
+
+        if (visualDateRange && hasMin && hasMax && !isAfterSelected) {
+          cell.classList.add('md-date-selected-hover');
+        }
+
+      } else if (visualDateRange && hasMin && hasMax && isEndDate) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-date-is-end-date');
+
+      } else if (visualDateRange && hasMin && !hasMax && isStartDate) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-date-is-start-date');
+
       } else {
         cell.classList.add('md-calendar-date-disabled');
         cell.textContent = cellText;

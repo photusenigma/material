@@ -78,6 +78,7 @@
               '<md-calendar role="dialog" aria-label="{{::ctrl.dateLocale.msgCalendar}}" ' +
                   'md-min-date="ctrl.minDate" md-max-date="ctrl.maxDate"' +
                   'md-date-filter="ctrl.dateFilter"' +
+                  'md-visual-date-range="ctrl.visualDateRange"' +
                   'ng-model="ctrl.date" ng-if="ctrl.isCalendarOpen">' +
               '</md-calendar>' +
             '</div>' +
@@ -87,7 +88,8 @@
         minDate: '=mdMinDate',
         maxDate: '=mdMaxDate',
         placeholder: '@mdPlaceholder',
-        dateFilter: '=mdDateFilter'
+        dateFilter: '=mdDateFilter',
+        visualDateRange: '<mdVisualDateRange'
       },
       controller: DatePickerCtrl,
       controllerAs: 'ctrl',
