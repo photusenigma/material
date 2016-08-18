@@ -109,6 +109,8 @@
       var isToday = this.dateUtil.isSameDay(opt_date, calendarCtrl.today);
       var isAfterSelected = opt_date >= calendarCtrl.selectedDate;
       var isBeforeSelected = opt_date <= calendarCtrl.selectedDate;
+      var selectedDateMidnight = calendarCtrl.dateUtil.createDateAtMidnight(calendarCtrl.selectedDate);
+      var isSameSelected = calendarCtrl.dateUtil.isSameDay(opt_date, selectedDateMidnight);
       var isEndDate = hasMax && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.maxDate, 1));
       var isStartDate = hasMin && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.minDate, -1));
 
@@ -147,7 +149,7 @@
           this.focusAfterAppend = cell;
         }
 
-        if (visualDateRange && hasMin && hasMax && (isToday || isAfterSelected)) {
+        if (visualDateRange && hasMin && hasMax && (isToday || isAfterSelected || isSameSelected)) {
           cell.classList.add('md-calendar-date-within-range');
         } 
 
