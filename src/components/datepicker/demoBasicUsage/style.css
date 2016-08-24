@@ -64,6 +64,19 @@ md-content {
     }
 }
 
-body .md-datepicker-calendar-pane .md-datepicker-input-mask {
-    width: initial;
+.md-calendar-date.md-calendar-date-today.md-calendar-selected-date.md-calendar-date-within-range span.md-calendar-date-selection-indicator {
+    background-color: #1976D2;
+    color: #fff;
+}
+
+.md-calendar-date.md-calendar-date-today.md-today-not-selected.md-date-selected-hover span.md-calendar-date-selection-indicator {
+    border-radius: 0;
+    border: none;
+    font-weight: bold;
+
+    &:hover {
+        border: none;
+        background-color: #90CAF9;
+        color: #000;
+    }
 }

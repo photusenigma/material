@@ -103,7 +103,8 @@
     cell.setAttribute('role', 'gridcell');
 
     if (opt_date) {
-      var visualDateRange = calendarCtrl.visualDateRange;
+      var isStartDatePicker = calendarCtrl.visualDateRange === 'start';
+      var isEndDatePicker = calendarCtrl.visualDateRange === 'end';
       var hasMin = calendarCtrl.minDate;
       var hasMax = calendarCtrl.maxDate;
       var isToday = this.dateUtil.isSameDay(opt_date, calendarCtrl.today);
@@ -149,27 +150,31 @@
           this.focusAfterAppend = cell;
         }
 
-        if (visualDateRange && hasMin && hasMax && (isToday || isAfterSelected || isSameSelected)) {
+        if (isStartDatePicker && (isToday || isAfterSelected || isSameSelected)) {
           cell.classList.add('md-calendar-date-within-range');
         } 
 
-        if (visualDateRange && hasMin && hasMax && isToday && isBeforeSelected) {
+        if (isStartDatePicker && isToday && isBeforeSelected) {
           cell.classList.add('md-today-not-selected');
         }
 
-        if (visualDateRange && hasMin && !hasMax && isBeforeSelected) {
+        if (isEndDatePicker && isToday && isAfterSelected) {
+          cell.classList.add('md-today-not-selected');
+        }
+
+        if (isEndDatePicker && isBeforeSelected) {
           cell.classList.add('md-calendar-date-within-range');
         }
 
-        if (visualDateRange && hasMin && !hasMax && !isBeforeSelected) {
+        if (isEndDatePicker && !isBeforeSelected) {
           cell.classList.add('md-date-selected-hover');
         }
 
-        if (visualDateRange && hasMin && hasMax && !isAfterSelected) {
+        if (isStartDatePicker && !isAfterSelected) {
           cell.classList.add('md-date-selected-hover');
         }
 
-      } else if (visualDateRange && hasMin && hasMax && isEndDate) {
+      } else if (isStartDatePicker && isEndDate) {
         var selectionIndicator = document.createElement('span');
         cell.appendChild(selectionIndicator);
         selectionIndicator.classList.add('md-calendar-date-selection-indicator');
@@ -177,7 +182,7 @@
         cell.classList.add('md-calendar-date-disabled');
         cell.classList.add('md-date-is-end-date');
 
-      } else if (visualDateRange && hasMin && !hasMax && isStartDate) {
+      } else if (isEndDatePicker && isStartDate) {
         var selectionIndicator = document.createElement('span');
         cell.appendChild(selectionIndicator);
         selectionIndicator.classList.add('md-calendar-date-selection-indicator');

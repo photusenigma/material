@@ -34,9 +34,12 @@
       </div>
     </form>
 
-    <h4>Date-picker with visual date range</h4>
+    <h4>Date-picker with visual date range (start)</h4>
     <md-datepicker ng-model="myDate" md-placeholder="Enter date"
-        md-min-date="minDate" md-max-date="maxDate" md-visual-date-range="true"></md-datepicker>
+        md-max-date="maxDate" md-visual-date-range="'start'"></md-datepicker>
+    <h4>Date-picker with visual date range (end)</h4>
+    <md-datepicker ng-model="myDate" md-placeholder="Enter date"
+        md-min-date="minDate" md-visual-date-range="'end'"></md-datepicker>
     
   </md-content>
 </div>
