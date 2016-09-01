@@ -59,6 +59,7 @@
         minDate: '=mdMinDate',
         maxDate: '=mdMaxDate',
         dateFilter: '=mdDateFilter',
+        visualDateRange: '<mdVisualDateRange',
       },
       require: ['ngModel', 'mdCalendar'],
       controller: CalendarCtrl,
