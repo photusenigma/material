@@ -60,6 +60,7 @@
         maxDate: '=mdMaxDate',
         dateFilter: '=mdDateFilter',
         visualDateRange: '<mdVisualDateRange',
+        dateRangeStart: '<mdDateRangeStart',
       },
       require: ['ngModel', 'mdCalendar'],
       controller: CalendarCtrl,
@@ -147,7 +148,9 @@
     /** @type {Date} */
     this.firstRenderableDate = this.dateUtil.incrementMonths(this.today, -this.items.length / 2);
 
-    if (this.minDate && this.minDate > this.firstRenderableDate) {
+    if (this.minDate && this.dateRangeStart) {
+      this.firstRenderableDate = this.dateRangeStart;
+    } else if (this.minDate && this.minDate > this.firstRenderableDate) {
       this.firstRenderableDate = this.minDate;
     } else if (this.maxDate) {
       // Calculate the difference between the start date and max date.

@@ -114,6 +114,10 @@
       var isSameSelected = calendarCtrl.dateUtil.isSameDay(opt_date, selectedDateMidnight);
       var isEndDate = hasMax && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.maxDate, 1));
       var isStartDate = hasMin && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.minDate, -1));
+      var dateRangeStart = calendarCtrl.dateRangeStart;
+      var isDateRangeStart = dateRangeStart && this.dateUtil.isSameDay(opt_date, dateRangeStart);
+      var isAfterStartDate = opt_date > dateRangeStart;
+      var isBeforeMinDate = opt_date <= hasMin;
 
       cell.setAttribute('tabindex', '-1');
       cell.setAttribute('aria-label', this.dateLocale.longDateFormatter(opt_date));
@@ -182,7 +186,23 @@
         cell.classList.add('md-calendar-date-disabled');
         cell.classList.add('md-date-is-end-date');
 
-      } else if (isEndDatePicker && isStartDate) {
+      } else if (isEndDatePicker && dateRangeStart && isBeforeMinDate && isAfterStartDate) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-calendar-date-within-range');
+
+      } else if (isEndDatePicker && isDateRangeStart) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-date-is-start-date');
+
+      } else if (isEndDatePicker && isStartDate && !dateRangeStart) {
         var selectionIndicator = document.createElement('span');
         cell.appendChild(selectionIndicator);
         selectionIndicator.classList.add('md-calendar-date-selection-indicator');
