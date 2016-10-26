@@ -105,6 +105,8 @@
                 'md-min-date="ctrl.minDate"' +
                 'md-max-date="ctrl.maxDate"' +
                 'md-date-filter="ctrl.dateFilter"' +
+                'md-visual-date-range="ctrl.visualDateRange"' +
+                'md-date-range-start="ctrl.dateRangeStart"' +
                 'ng-model="ctrl.date" ng-if="ctrl.isCalendarOpen">' +
             '</md-calendar>' +
           '</div>' +
@@ -118,7 +120,9 @@
         currentView: '@mdCurrentView',
         dateFilter: '=mdDateFilter',
         isOpen: '=?mdIsOpen',
-        debounceInterval: '=mdDebounceInterval'
+        debounceInterval: '=mdDebounceInterval',
+        visualDateRange: '<mdVisualDateRange',
+        dateRangeStart: '<mdDateRangeStart'
       },
       controller: DatePickerCtrl,
       controllerAs: 'ctrl',

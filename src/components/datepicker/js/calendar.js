@@ -58,7 +58,9 @@
         minDate: '=mdMinDate',
         maxDate: '=mdMaxDate',
         dateFilter: '=mdDateFilter',
-        _currentView: '@mdCurrentView'
+        _currentView: '@mdCurrentView',
+        visualDateRange: '<mdVisualDateRange',
+        dateRangeStart: '<mdDateRangeStart'
       },
       require: ['ngModel', 'mdCalendar'],
       controller: CalendarCtrl,
@@ -205,7 +207,9 @@
       angular.element(document.body).off('keydown', boundKeyHandler);
     });
 
-    if (this.minDate && this.minDate > $mdDateLocale.firstRenderableDate) {
+    if (this.minDate && this.dateRangeStart) {
+      this.firstRenderableDate = this.dateRangeStart;
+    } else if (this.minDate && this.minDate > $mdDateLocale.firstRenderableDate) {
       this.firstRenderableDate = this.minDate;
     } else {
       this.firstRenderableDate = $mdDateLocale.firstRenderableDate;

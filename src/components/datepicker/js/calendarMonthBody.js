@@ -109,6 +109,22 @@
     cell.setAttribute('role', 'gridcell');
 
     if (opt_date) {
+      var isStartDatePicker = calendarCtrl.visualDateRange === 'start';
+      var isEndDatePicker = calendarCtrl.visualDateRange === 'end';
+      var hasMin = calendarCtrl.minDate;
+      var hasMax = calendarCtrl.maxDate;
+      var isToday = this.dateUtil.isSameDay(opt_date, calendarCtrl.today);
+      var isAfterSelected = opt_date >= calendarCtrl.selectedDate;
+      var isBeforeSelected = opt_date <= calendarCtrl.selectedDate;
+      var selectedDateMidnight = calendarCtrl.dateUtil.createDateAtMidnight(calendarCtrl.selectedDate);
+      var isSameSelected = calendarCtrl.dateUtil.isSameDay(opt_date, selectedDateMidnight);
+      var isEndDate = hasMax && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.maxDate, 1));
+      var isStartDate = hasMin && this.dateUtil.isSameDay(opt_date, this.dateUtil.incrementDays(calendarCtrl.minDate, -1));
+      var dateRangeStart = calendarCtrl.dateRangeStart;
+      var isDateRangeStart = dateRangeStart && this.dateUtil.isSameDay(opt_date, dateRangeStart);
+      var isAfterStartDate = opt_date > dateRangeStart;
+      var isBeforeMinDate = opt_date <= hasMin;
+
       cell.setAttribute('tabindex', '-1');
       cell.setAttribute('aria-label', this.dateLocale.longDateFormatter(opt_date));
       cell.id = calendarCtrl.getDateId(opt_date, 'month');
@@ -131,6 +147,7 @@
       var cellText = this.dateLocale.dates[opt_date.getDate()];
 
       if (this.isDateEnabled(opt_date)) {
+     
         // Add a indicator for select, hover, and focus states.
         var selectionIndicator = document.createElement('span');
         selectionIndicator.classList.add('md-calendar-date-selection-indicator');
@@ -141,6 +158,63 @@
         if (calendarCtrl.displayDate && this.dateUtil.isSameDay(opt_date, calendarCtrl.displayDate)) {
           this.focusAfterAppend = cell;
         }
+
+        if (isStartDatePicker && (isToday || isAfterSelected || isSameSelected)) {
+          cell.classList.add('md-calendar-date-within-range');
+        } 
+
+        if (isStartDatePicker && isToday && isBeforeSelected) {
+          cell.classList.add('md-today-not-selected');
+        }
+
+        if (isEndDatePicker && isToday && isAfterSelected) {
+          cell.classList.add('md-today-not-selected');
+        }
+
+        if (isEndDatePicker && isBeforeSelected) {
+          cell.classList.add('md-calendar-date-within-range');
+        }
+
+        if (isEndDatePicker && !isBeforeSelected) {
+          cell.classList.add('md-date-selected-hover');
+        }
+
+        if (isStartDatePicker && !isAfterSelected) {
+          cell.classList.add('md-date-selected-hover');
+        }
+
+      } else if (isStartDatePicker && isEndDate) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-date-is-end-date');
+
+      } else if (isEndDatePicker && dateRangeStart && isBeforeMinDate && isAfterStartDate) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-calendar-date-within-range');
+
+      } else if (isEndDatePicker && isDateRangeStart) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-date-is-start-date');
+
+      } else if (isEndDatePicker && isStartDate && !dateRangeStart) {
+        var selectionIndicator = document.createElement('span');
+        cell.appendChild(selectionIndicator);
+        selectionIndicator.classList.add('md-calendar-date-selection-indicator');
+        selectionIndicator.textContent = cellText;
+        cell.classList.add('md-calendar-date-disabled');
+        cell.classList.add('md-date-is-start-date');
+
       } else {
         cell.classList.add('md-calendar-date-disabled');
         cell.textContent = cellText;

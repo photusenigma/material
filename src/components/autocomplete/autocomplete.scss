@@ -50,6 +50,30 @@ md-autocomplete {
 
     md-input-container {
       padding-bottom: 0px;
+
+      .md-select-icon {
+        position: absolute;
+        display: block;
+        top: 12px;
+        right: 2px;
+        transform: translate3d(0, 1px, 0);
+        font-size: .84rem;
+        opacity: .3;
+
+        &:after {
+          display: block;
+          content: '\25BC';
+          position: relative;
+          top: 2px;
+          speak: none;
+          transform: scaleY(0.6) scaleX(1);
+        }
+      }
+
+      &.md-input-focused .md-select-icon {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
     md-autocomplete-wrap {
       height: auto;
@@ -185,6 +209,7 @@ md-autocomplete {
       }
     }
   }
+
   // IE Only
   @media screen and (-ms-high-contrast: active) {
     $border-color: #fff;

@@ -165,9 +165,23 @@ function MdAutocomplete ($$mdSvgRegistry) {
       autoselect:       '=?mdAutoselect',
       menuClass:        '@?mdMenuClass',
       inputId:          '@?mdInputId',
-      escapeOptions:    '@?mdEscapeOptions'
+      escapeOptions:    '@?mdEscapeOptions',
+
+      // PIX ADDED ITEMS
+      revertOnBlur:     '=?mdRevertOnBlur',
+      clearOnFocus:     '=?mdClearOnFocus',
+      itemHasFocus:     '=?mdItemHasFocus',
+      itemFocusChange:  '&?mdItemFocusChange',
+      actLikeSelect:    '&?mdActLikeSelect',
+      showItemTooltips: '&?mdShowItemTooltips',
+      itemDisplayProp:  '&?mdItemDisplayProp'
     },
     link: function(scope, element, attrs, controller) {
+      if (attrs.hasOwnProperty('mdActLikeSelect')) {
+          scope.revertOnBlur = true;
+          scope.clearOnFocus = true;
+      }
+
       // Retrieve the state of using a md-not-found template by using our attribute, which will
       // be added to the element in the template function.
       controller.hasNotFound = !!element.attr('md-has-not-found');
@@ -208,7 +222,7 @@ function MdAutocomplete ($$mdSvgRegistry) {
             <ul class="md-autocomplete-suggestions"\
                 ng-class="::menuClass"\
                 id="ul-{{$mdAutocompleteCtrl.id}}">\
-              <li md-virtual-repeat="item in $mdAutocompleteCtrl.matches"\
+              <li '+ getItemTooltip() +' md-virtual-repeat="item in $mdAutocompleteCtrl.matches"\
                   ng-class="{ selected: $index === $mdAutocompleteCtrl.index }"\
                   ng-click="$mdAutocompleteCtrl.select($index)"\
                   md-extra-name="$mdAutocompleteCtrl.itemName">\
@@ -223,6 +237,12 @@ function MdAutocomplete ($$mdSvgRegistry) {
             aria-live="assertive">\
           <p ng-repeat="message in $mdAutocompleteCtrl.messages track by $index" ng-if="message">{{message}}</p>\
         </aria-status>';
+
+      function getItemTooltip() {
+        var displayProp = attr.hasOwnProperty('mdItemDisplayProp') ? attr.mdItemDisplayProp : 'display';
+        var itemTag = "item['"+ displayProp +"']";
+        return attr.hasOwnProperty('mdShowItemTooltips') ? 'title="{{'+ itemTag +'}}"' : '';
+      }
 
       function getItemTemplate() {
         var templateTag = element.find('md-item-template').detach(),
@@ -271,6 +291,7 @@ function MdAutocomplete ($$mdSvgRegistry) {
                   aria-activedescendant=""\
                   aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"/>\
               <div md-autocomplete-parent-scope md-autocomplete-replace>' + leftover + '</div>\
+              ' + (attr.hasOwnProperty('mdActLikeSelect') ? getSelectIcon() : '') + '\
             </md-input-container>';
         } else {
           return '\
@@ -306,6 +327,10 @@ function MdAutocomplete ($$mdSvgRegistry) {
             </button>\
                 ';
         }
+      }
+
+      function getSelectIcon() {
+        return '<span class="md-select-icon" aria-hidden="true" ng-click="$mdAutocompleteCtrl.focusInputElement()"></span>';
       }
     }
   };
